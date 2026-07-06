@@ -1,0 +1,8 @@
+# 第7章サンプルの依存パッケージ
+# グラフを動かすには langgraph が必要（langchain-core も一緒に入る）。
+# ドライラン（擬似モデル）はこの2つだけで動く。
+langgraph>=0.2
+langchain-core>=0.3
+# 本番モード（実モデルに自走させる場合）のみ必要：
+# langchain>=0.3
+# langchain-anthropic>=0.3

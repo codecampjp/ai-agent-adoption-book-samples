@@ -1,0 +1,10 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Chroma / RAG artifacts
+.chroma/
+
+# 実行ログ・一時成果物
+_verify_logs/

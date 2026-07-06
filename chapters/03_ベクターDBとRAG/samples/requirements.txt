@@ -1,0 +1,12 @@
+# 第3章サンプルの依存パッケージ
+# 本書の動作確認バージョン（3-3 脚注）: chromadb 1.5.x / sentence-transformers 5.x
+chromadb>=1.5,<2
+sentence-transformers>=5,<6
+# transformers 5.x は新しすぎて一部環境（Intel Mac / torch 2.2.x）で読み込みに失敗するため、
+# 安定して動く 4.x 系に固定する（sentence-transformers 5.x は 4.41 以上で動作）。
+transformers>=4.41,<5
+# torch 2.2.x（Intel Mac の最新）は numpy 2.x と非互換のため 1.x 系に固定する。
+numpy>=1.22,<2
+
+# 3-5 の「生成あり」モードを試す場合のみ（任意）。
+# anthropic>=0.40

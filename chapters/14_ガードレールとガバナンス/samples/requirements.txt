@@ -1,0 +1,13 @@
+# 第14章サンプルの依存。
+# オフラインのドライラン（_common.py / 14-3 / 14-4 / 14-5 / 14-6 / 14-7）は【追加依存なし】。
+# 標準ライブラリだけで動く（Python 3.10 以上。実行確認は 3.12）。
+#
+# 以下は本文で紹介するガードレール/PIIツールを実際に使う場合の任意依存（更新が速いので版に上限）。
+# オフラインのドライランには不要なのでコメントアウトしている。
+#
+# guardrails-ai>=0.9,<1     # 入出力ガード（Guardrails Hub の validator。導入は `guardrails hub install`）
+# presidio-analyzer>=2,<3   # PII 検出（NER を使う場合は spaCy 等のモデルも要る）
+# presidio-anonymizer>=2,<3 # PII マスキング（置換／伏字／マスク／ハッシュ／暗号化）
+#
+# NeMo Guardrails・Amazon Bedrock Guardrails・Azure AI Content Safety は
+# それぞれ別途のSDK／クラウド設定が要る（本文 14-3 参照）。
