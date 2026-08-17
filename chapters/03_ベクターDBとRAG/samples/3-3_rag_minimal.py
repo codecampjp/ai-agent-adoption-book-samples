@@ -2,7 +2,7 @@
 
 本書 3-3 節の掲載コードを、そのまま実行できる形にまとめたもの。
 RAG の2段階のうち「取り込み（インデックス作成）」と「検索」を動かす。
-「生成」は 3-5_rag_with_generation.py を参照。
+「生成」は 3-4_rag_with_generation.py を参照。
 
 実行:
     python 3-3_rag_minimal.py

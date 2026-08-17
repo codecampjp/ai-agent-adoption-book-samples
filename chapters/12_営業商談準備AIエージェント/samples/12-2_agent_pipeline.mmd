@@ -1,0 +1,37 @@
+---
+config:
+  flowchart:
+    curve: linear
+---
+graph TD;
+	__start__([<p>__start__</p>]):::first
+	planner(planner)
+	review_plan(review_plan)
+	replan(replan)
+	executor(executor)
+	tools(tools)
+	advance(advance)
+	synthesizer(synthesizer)
+	review_draft(review_draft)
+	withhold(withhold)
+	finalize(finalize)
+	__end__([<p>__end__</p>]):::last
+	__start__ --> planner;
+	advance -.-> executor;
+	advance -.-> synthesizer;
+	executor -.-> advance;
+	executor -.-> tools;
+	planner -.-> executor;
+	planner -.-> review_plan;
+	review_draft -.-> finalize;
+	review_draft -.-> withhold;
+	review_plan -.-> executor;
+	review_plan -.-> replan;
+	synthesizer --> review_draft;
+	tools --> executor;
+	finalize --> __end__;
+	replan --> __end__;
+	withhold --> __end__;
+	classDef default fill:#f2f0ff,line-height:1.2
+	classDef first fill-opacity:0
+	classDef last fill:#bfb6fc

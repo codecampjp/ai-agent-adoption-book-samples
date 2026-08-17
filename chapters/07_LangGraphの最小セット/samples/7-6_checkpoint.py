@@ -1,8 +1,9 @@
 """7-6 Checkpoint：状態の永続化 ── 完全版
 
-本文 7-6 では「コンパイル時にチェックポインターを渡すだけ」という概念の核だけを
-掲載した。このファイルは、その続き（同じ thread_id で呼ぶと前回の会話を覚えている／
-別の thread_id ならまっさらから始まる）を実際に動かして確かめられるようにしたもの。
+本文 7-6 では「(1) コンパイル時にチェックポインターを渡す／(2) 実行時に thread_id を
+指定する」という骨格だけを掲載した。このファイルは、その続き（同じ thread_id で
+呼ぶと前回の会話を覚えている／別の thread_id ならまっさらから始まる）を
+実際に動かして確かめられるようにしたもの。実行の流れは README も参照。
 
 LLM もネットワークも不要。respond ノードは過去の会話（state["messages"]）を全部
 読めるので、「チェックポインターのおかげで状態が持ち回られている」ことが確認できる。
@@ -46,7 +47,7 @@ def build_graph():
     builder.add_node("respond", respond)
     builder.add_edge(START, "respond")
     builder.add_edge("respond", END)
-    # ★ コンパイル時にチェックポインターを渡す（本文の概念コードと同じ）
+    # ★ (1) コンパイル時にチェックポインターを渡す（本文の概念コードと同じ）
     return builder.compile(checkpointer=InMemorySaver())
 
 
@@ -56,10 +57,15 @@ def say(graph, config, text):
     print(f"  bot > {out['messages'][-1].content}")
 
 
+# 実行の流れ（トレース解説：本文 7-6 から移設）:
+#   1回目の invoke（thread-1）: まっさらな黒板に「私はボブです」が積まれ、節目で保存される
+#   2回目の invoke（thread-1）: 同じ thread_id → 保存済みの黒板が復元され、
+#                               respond ノードは過去の発言から「ボブ」を見つけられる
+#   3回目の invoke（thread-2）: 別の thread_id → 別の黒板。過去の会話は見えない
 def main():
     graph = build_graph()
 
-    # 同じ thread_id なら、前回の状態（会話）を覚えている
+    # ★ (2) 実行時に thread_id を指定する。同じIDなら前回の状態（会話）を覚えている
     config = {"configurable": {"thread_id": "thread-1"}}
     print("[thread-1]")
     say(graph, config, "こんにちは、私はボブです。")

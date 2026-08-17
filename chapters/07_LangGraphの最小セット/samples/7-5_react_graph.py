@@ -3,6 +3,8 @@
 本文 7-5 では「構造（状態・ノード・エッジ・分岐・戻り線）」に集中するため、
 モデルやツールの準備といった周辺コードを省いた骨格だけを掲載した。
 このファイルはその省いた周辺コードを補い、そのまま動かせるようにしたもの。
+実行が1周する流れ（START→model→分岐→tools→model→…→END）は、
+末尾 main() 上のトレース解説コメントと README を参照（本文から移設）。
 
 APIキーなし（ドライラン）でも動く：在庫確認エージェントを模した FakeReActModel が、
 「A-100 を確認 → 品切れ → B-200 を確認 → 在庫あり → 最終回答」という ReAct ループを
@@ -22,6 +24,7 @@ from langgraph.graph.message import add_messages
 
 
 # --- 状態（本文掲載） ------------------------------------------------------
+# add_messages はリデューサ：ノードが返したメッセージを「上書きではなく追記」する。
 class State(TypedDict):
     messages: Annotated[list, add_messages]
 
@@ -62,7 +65,7 @@ def build_model():
             model = init_chat_model("claude-sonnet-4-6", model_provider="anthropic")
             from langchain_core.tools import tool
 
-            @tool
+            @tool("get_stock")  # execute_tool_calls が探す名前に合わせる（既定は関数名になる）
             def get_stock_tool(product_code: str) -> str:
                 """商品コードの在庫数を返す。"""
                 return str(get_stock(product_code))
@@ -103,14 +106,14 @@ class FakeReActModel:
 
 # --- ノードとエッジ（本文掲載） --------------------------------------------
 def call_model(state: State):
-    response = model.invoke(state["messages"])  # 道具を渡したモデルに問い合わせる
+    response = model.invoke(state["messages"])  # bind_toolsで道具を結びつけたモデルに問い合わせる
     return {"messages": [response]}             # 応答を会話に追記
 
 
 def run_tools(state: State):
     last = state["messages"][-1]                # 直前のモデル応答
-    results = execute_tool_calls(last)          # 要求された道具を実行
-    return {"messages": results}                # 実行結果を会話に追記
+    results = execute_tool_calls(last)          # 要求された道具を実行（役割は前章6-3と同じ）
+    return {"messages": results}                # 実行結果（tool_result）を会話に追記
 
 
 def should_continue(state: State):
@@ -133,6 +136,23 @@ def build_graph():
 model, real_mode = build_model()
 
 
+# --- 実行の流れ（トレース解説：本文 7-5 から移設） --------------------------
+# ドライランでは、invoke 1回の中でグラフが次の順にノードを巡る。
+#
+#   START
+#   → model ノード（1周目）: モデルが「A-100 の在庫を確認したい」と tool_use を返す
+#   → should_continue: tool_calls あり → "tools" へ
+#   → tools ノード: get_stock("A-100") を実行 → 0（品切れ）を会話に追記
+#   → 固定エッジで model へ戻る（★ここが前章の while ループの戻り）
+#   → model ノード（2周目）: 品切れを見て「B-200 も確認したい」と tool_use を返す
+#   → should_continue: tool_calls あり → "tools" へ
+#   → tools ノード: get_stock("B-200") を実行 → 15（在庫あり）を会話に追記
+#   → model へ戻る
+#   → model ノード（3周目）: 材料が揃ったので最終回答（tool_calls なし）を返す
+#   → should_continue: tool_calls なし → END
+#
+# 各周で「会話への追記」を messages.append と書いていないことに注意。
+# ノードは追記したい分を返すだけで、積む作業はリデューサ add_messages の仕事。
 def main():
     if not real_mode:
         print("[メモ] ANTHROPIC_API_KEY 未設定のため、擬似モデルで流れだけを表示します。\n")
@@ -140,7 +160,7 @@ def main():
     question = "商品A-100の在庫を確認して。品切れなら代替品B-200の在庫も調べて、まとめて報告して。"
     result = graph.invoke(
         {"messages": [HumanMessage(content=question)]},
-        {"recursion_limit": 25},
+        {"recursion_limit": 25},   # 暴走の歯止め（本文 7-4）：ステップ数の上限
     )
     for m in result["messages"]:
         kind = type(m).__name__

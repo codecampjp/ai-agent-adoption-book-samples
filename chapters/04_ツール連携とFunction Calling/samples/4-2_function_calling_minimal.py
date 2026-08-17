@@ -75,7 +75,7 @@ def run_tool(name: str, tool_input: dict) -> str:
     """tool_use の name / input から、対応する実装を呼び出す。
 
     実務では、ここで入力検証・権限確認・（取り消せない操作なら）人間の承認を挟む。
-    詳細は本書 4-5 / 第14章を参照。
+    詳細は本書 4-5 / 第15章を参照。
     """
     impl = TOOL_IMPLEMENTATIONS.get(name)
     if impl is None:

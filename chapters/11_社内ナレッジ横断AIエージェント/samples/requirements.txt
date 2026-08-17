@@ -1,0 +1,4 @@
+# 第11章サンプルの依存。更新が速い分野なので版に上限を切って固定する。
+langgraph>=1,<2
+langchain-mcp-adapters>=0.3,<1
+fastmcp>=3,<4

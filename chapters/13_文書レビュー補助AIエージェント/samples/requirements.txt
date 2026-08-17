@@ -1,0 +1,5 @@
+# 第13章サンプルの依存。更新が速い分野なので版に上限を切る。
+langgraph>=1,<2
+langchain-core>=1,<2
+# 本番でWorkerに Claude Agent SDK を使う場合のみ（オフラインのドライランには不要）：
+# claude-agent-sdk>=0.2,<1
