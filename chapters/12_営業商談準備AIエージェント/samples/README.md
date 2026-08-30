@@ -15,6 +15,7 @@
 | `12-5_executor_loop.py` | 12-5 / 12-6「異なる情報源をツールとして使い分ける」 | ToolNode を使うステップ内ループ（小）と計画全体のループ（大）の二重構造 | 不要 |
 | `12-2_agent_pipeline.py` | 12-2〜12-7 | Planner → リスク判定 → 必要時HITL① → Executor → Synthesizer → HITL② → 出力の全体版。4経路（自動実行/確認して承認/却下/ドラフト却下）を自動デモ | 不要 |
 | `12-2_export_mermaid.py` ＋ `12-2_agent_pipeline.mmd` | 12-2「処理フローとアーキテクチャの全体設計」 | 全体版グラフのノードとエッジを Mermaid 形式で書き出し、本文の図と突き合わせられる | 不要 |
+| `12-7_agent_pipeline.py` | 12-7「Synthesizerが調査結果を束ねる」 | 本文 12-7 から参照される実行エントリー。実体は `12-2_agent_pipeline.py`（Synthesizer は同ファイルの 12-7 セクション）で、同じ4経路の自動デモが動く | 不要 |
 | `interactive_meeting_prep.py` | （本リポジトリ限定の追加教材。本文には登場しません） | 自分の商談相手・目的で Planner の計画を確かめ、HITL①②の承認・修正・却下を標準入力で体験 | 任意 |
 
 ## 前提
@@ -64,6 +65,7 @@ python 12-5_langgraph_features_minimal.py   # interrupt / ToolNode / ループ�
 python 12-4_planner_hitl.py                 # 条件付きHITL①（自動実行・承認・却下）
 python 12-5_executor_loop.py                # 二重ループで計画を消化
 python 12-2_agent_pipeline.py               # 全体版（4経路の自動デモ）
+python 12-7_agent_pipeline.py               # 同上（本文12-7からの参照名。実体は12-2）
 python 12-2_export_mermaid.py               # グラフ構造を .mmd へ書き出し
 ```
 

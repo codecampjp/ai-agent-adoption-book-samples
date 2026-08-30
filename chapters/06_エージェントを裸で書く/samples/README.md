@@ -18,7 +18,8 @@
 | [`6-1_dify_agent_setup.md`](6-1_dify_agent_setup.md) | 6-1 | Difyの画面ごとの詳細な操作手順（クラウド版・セルフホスト版共通） | 同上 |
 | [`6-1_サンプル社内規程.md`](6-1_サンプル社内規程.md) | 6-1 | 上記手順でナレッジに登録する架空の社内規程 | 不要 |
 | `6-3_agent_loop_minimal.py` | 6-3 | 最小エージェントループ。`while True` で tool_use をさばき、最終回答で抜ける。コード内の (a)〜(d) は本文と対応 | なしでドライラン可 |
-| `6-5_agent_loop_observable.py` | 6-4／6-5 | 6-3 に停止条件（最大反復回数）とステップごとのログを足した版 | なしでドライラン可 |
+| `6-4_agent_loop_observable.py` | 6-4 | 6-3 に停止条件（最大反復回数）を足した版。`for ... else` で上限到達を検知 | なしでドライラン可 |
+| `6-5_agent_loop_observable.py` | 6-5 | 6-4 にさらにステップごとのログ（stop_reason・トークン・道具呼び出し）を足した版 | なしでドライラン可 |
 | `interactive_agent_loop.py` | （本文になし） | 自分の質問を入力して、ループの各ステップ（LLM呼び出し→ツール選択→実行→最終回答）を観察する。**本リポジトリ限定の追加教材** | なしでドライラン可 |
 
 Pythonサンプルのツールは在庫照会 `get_stock` のみで、ダミー在庫は A-100=0（品切れ）、B-200=15（在庫あり）です。
@@ -54,6 +55,7 @@ pip install -r requirements.txt
 
 ```bash
 python 6-3_agent_loop_minimal.py
+python 6-4_agent_loop_observable.py
 python 6-5_agent_loop_observable.py
 ```
 
@@ -69,6 +71,8 @@ python 6-5_agent_loop_observable.py
 (b) 次の問い合わせでモデルは道具を要求しない（stop_reason は tool_use 以外）
 (d) ループを抜ける → 最終回答（例：『商品A-100は品切れですが、代替品B-200が15個あります』）
 ```
+
+`6-4_agent_loop_observable.py` は、上限つきループの2つの止まり方（break による正常終了と、`for ... else` が発火する上限到達）を表示します。
 
 `6-5_agent_loop_observable.py` は、本文 6-5 の「期待される記録」と同じ形のステップログを再現します。
 
@@ -87,13 +91,14 @@ python 6-5_agent_loop_observable.py
 ```bash
 export ANTHROPIC_API_KEY=sk-ant-...      # Windows は set ANTHROPIC_API_KEY=...
 python 6-3_agent_loop_minimal.py
+python 6-4_agent_loop_observable.py
 python 6-5_agent_loop_observable.py
 ```
 
 キーが未設定、または `anthropic` 未導入のときは自動でドライランに切り替わります。実行前に次の4点を確認してください。
 
 - **従量課金です**。1回の実行はループ2〜3周・入出力合わせて数千トークン程度が目安ですが、料金はモデルと実際の使用量で決まります。Anthropicの料金ページで確認してください
-- **モデル名は廃止されることがあります**。モデル名は `6-3_agent_loop_minimal.py` 冒頭の `MODEL`（執筆時点は `claude-sonnet-4-6`）の1か所で管理していて、`6-5_` と `interactive_agent_loop.py` はこれを共有します。モデルが見つからないというエラーが出たら、公式ドキュメントで現行のモデル名を確認して `6-3_` の `MODEL` を書き換えてください。確かめたいのは「ツール使用をループで回す骨格」であり、これはモデルが替わっても変わりません
+- **モデル名は廃止されることがあります**。モデル名は `6-3_agent_loop_minimal.py` 冒頭の `MODEL`（執筆時点は `claude-sonnet-4-6`）の1か所で管理していて、`6-4_`・`6-5_`・`interactive_agent_loop.py` はこれを共有します。モデルが見つからないというエラーが出たら、公式ドキュメントで現行のモデル名を確認して `6-3_` の `MODEL` を書き換えてください。確かめたいのは「ツール使用をループで回す骨格」であり、これはモデルが替わっても変わりません
 - **入力はAnthropicのAPIに送信されます**。依頼文やツール結果がAPIに送られるため、業務上の秘密情報を含む文字列は使わないでください
 - **出力は毎回変わります**。モデルの回答は非決定的で、本READMEの出力例と一字一句は一致しません。ループの回数（何周で最終回答に至るか）が変わることもあります
 
@@ -121,5 +126,5 @@ Difyのハンズオンを自分の手で確かめたい場合は [`6-1_dify_clou
 | キーを設定したのにドライランになる | `echo $ANTHROPIC_API_KEY`（Windows は `echo %ANTHROPIC_API_KEY%`）で同じシェルに設定されているか確認してください |
 | `not_found_error` などモデル名に関するエラー | モデル名の世代交代です。`6-3_agent_loop_minimal.py` の `MODEL` を現行モデル名に書き換えてください |
 | 認証エラー（401） | APIキーの値を確認してください。キーはAnthropicのコンソールで発行します |
-| `6-5_` や `interactive_` の起動時に import エラー | 両ファイルは `6-3_agent_loop_minimal.py` を読み込みます。`samples` フォルダの中で実行してください |
+| `6-4_`・`6-5_` や `interactive_` の起動時に import エラー | これらのファイルは `6-3_agent_loop_minimal.py` を読み込みます。`samples` フォルダの中で実行してください |
 | Difyの画面が手順書と違う | UIは変わり得ます。`6-1_dify_agent_setup.md` 冒頭のバージョン注記を参照してください |
