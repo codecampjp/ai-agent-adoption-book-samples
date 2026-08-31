@@ -26,7 +26,7 @@ uv を使う場合:
 ```bash
 cd chapters/03_ベクターDBとRAG/samples
 uv venv
-source .venv/bin/activate        # Windows は .venv\Scripts\activate
+source .venv/bin/activate        # Windows は .venv\Scripts\activate sourceは不要です。
 uv pip install -r requirements.txt
 ```
 
@@ -78,7 +78,7 @@ python 3-4_rag_with_generation.py
 
 ```bash
 pip install anthropic                    # uv でセットアップした場合は: uv pip install anthropic
-export ANTHROPIC_API_KEY=sk-ant-...      # Windows (cmd) は set ANTHROPIC_API_KEY=...
+export ANTHROPIC_API_KEY=sk-ant-...      # Windows (cmd) は set ANTHROPIC_API_KEY=... powershellの場合$env:ANTHROPIC_API_KEY=...
 python 3-4_rag_with_generation.py
 ```
 
