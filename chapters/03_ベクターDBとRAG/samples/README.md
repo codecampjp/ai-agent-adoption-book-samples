@@ -39,7 +39,7 @@ uv がない場合（標準の venv + pip）:
 cd chapters/03_ベクターDBとRAG/samples
 python3 -m venv .venv
 source .venv/bin/activate        
-# Windows（cmd/powershell）の場合は下記のコマンドになります。sourceの記述は不要です。
+# Windows（cmd/powershell）の場合は下記のコマンドになります。sourceの記述は不要です。以降のチャプターも同様です。
 .venv\Scripts\activate
 
 pip install -r requirements.txt
