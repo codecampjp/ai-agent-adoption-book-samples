@@ -8,7 +8,7 @@
 ## 収録ファイル
 
 | ファイル | 対応する本文の節 | 確かめられること | APIキー |
-|---------|----------------|----------------|--------|
+| --------- | ---------------- | ---------------- | -------- |
 | `3-3_rag_minimal.py` | 3-3「手を動かす：Chromaで最小のRAGを組む」 | 取り込み→検索。日本語の質問で意味の近い文書が取り出せること | 不要 |
 | `3-4_rag_with_generation.py` | 3-4「チャンク分割と検索結果の渡し方」（後半の生成部分） | 検索結果を「参考文書」欄に差し込んだプロンプトの組み立て。キーがあれば Claude での回答生成まで | 任意 |
 | `interactive_rag.py` | （本リポジトリ限定の追加教材。本文には登場しません） | 自分で考えた質問での検索・生成の試行 | 検索のみなら不要 |
@@ -26,7 +26,10 @@ uv を使う場合:
 ```bash
 cd chapters/03_ベクターDBとRAG/samples
 uv venv
-source .venv/bin/activate        # Windows は .venv\Scripts\activate sourceは不要です。
+source .venv/bin/activate        
+# Windows（cmd/powershell）の場合は下記のコマンドになります。sourceの記述は不要です。以降のチャプターも同様です。
+.venv\Scripts\activate
+
 uv pip install -r requirements.txt
 ```
 
@@ -35,7 +38,10 @@ uv がない場合（標準の venv + pip）:
 ```bash
 cd chapters/03_ベクターDBとRAG/samples
 python3 -m venv .venv
-source .venv/bin/activate        # Windows は .venv\Scripts\activate
+source .venv/bin/activate        
+# Windows（cmd/powershell）の場合は下記のコマンドになります。sourceの記述は不要です。
+.venv\Scripts\activate
+
 pip install -r requirements.txt
 ```
 

@@ -14,7 +14,7 @@
 ## 収録ファイル
 
 | ファイル | 本文の節 | 確かめられること | APIキー |
-|---------|---------|----------------|--------|
+| --------- | --------- | ---------------- | -------- |
 | `7-3_minimal_graph.py` | 7-3 | 状態1つ・1ノードの最小グラフ。4ステップ（状態→ノード→エッジ→コンパイル）の型 | 不要 |
 | `7-5_react_graph.py` | 7-5 | 手書きReActをStateGraphで組み直した版。モデルノード・ツールノード・条件分岐・戻り線 | なしでドライラン可（擬似モデル） |
 | `7-6_checkpoint.py` | 7-6 | InMemorySaver＋`thread_id` で会話を継続。同じIDは前回を覚え、別IDはまっさら | 不要 |
@@ -117,7 +117,7 @@ python 7-7_studio_app.py     # Studio に映すグラフ構造を Mermaid で出
 
 ```bash
 pip install langchain langchain-anthropic   # uv の場合: uv pip install --python .venv langchain langchain-anthropic
-export ANTHROPIC_API_KEY=sk-ant-...         # Windows は set ANTHROPIC_API_KEY=...
+export ANTHROPIC_API_KEY=sk-ant-...         # Windows(cmd) は set ANTHROPIC_API_KEY=... Windows（powershell）は $env:ANTHROPIC_API_KEY="..."
 python 7-5_react_graph.py
 ```
 
@@ -188,7 +188,7 @@ langgraph dev        # samples フォルダで実行（langgraph.json を読む�
 ## うまくいかないとき
 
 | 症状 | 対処 |
-|------|------|
+| ------ | ------ |
 | `ModuleNotFoundError: No module named 'langgraph'` | セットアップの手順で `requirements.txt` をインストールし、仮想環境を有効化した状態で実行してください |
 | `7-7_studio_app.py` の起動時に import エラー | `7-5_react_graph.py` を読み込みます。`samples` フォルダの中で実行してください |
 | `langgraph dev` が見つからない | `pip install -U "langgraph-cli[inmem]"` を実行してください（`requirements.txt` には含めていません） |

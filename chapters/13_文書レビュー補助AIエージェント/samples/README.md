@@ -8,7 +8,7 @@
 ## 収録ファイル
 
 | ファイル | 対応する本文の節 | 確かめられること | APIキー |
-|---------|----------------|----------------|--------|
+| --------- | ---------------- | ---------------- | -------- |
 | `_common.py` | 13-5「Workerが観点別に分析する」/ 13-6「結果を統合し根拠を照合する」 | 共通部品（ダミー業務委託契約書、キーワード規則の擬似Worker、根拠照合 `validate_findings`、擬似統合）。単体実行はしない | 不要 |
 | `13-4_parallel_minimal.py` | 13-4「Supervisorが観点を分配する」 | fan-out（複数行き先エッジ）、reducer（`operator.add`）での fan-in、`Send` API による動的並列の最小例 | 不要 |
 | `13-4_supervisor.py` | 13-4 | Supervisor が3観点の Worker へ並列に振り分け、結果が reducer で集約されること | 不要 |
@@ -108,7 +108,7 @@ USE_CLAUDE_AGENT_SDK=1 python 13-5_worker.py
 
 ```bash
 pip install anthropic
-export ANTHROPIC_API_KEY=sk-ant-...      # Windows (cmd) は set ANTHROPIC_API_KEY=...
+export ANTHROPIC_API_KEY=sk-ant-...      # Windows (cmd) は set ANTHROPIC_API_KEY=... Windows（powershell）は $env:ANTHROPIC_API_KEY="..."
 python interactive_doc_review.py --file レビューしたい文書.txt
 ```
 

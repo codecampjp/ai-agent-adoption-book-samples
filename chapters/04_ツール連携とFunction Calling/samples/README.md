@@ -8,7 +8,7 @@
 ## 収録ファイル
 
 | ファイル | 対応する本文の節 | 確かめられること | APIキー |
-|---------|----------------|----------------|--------|
+| --------- | ---------------- | ---------------- | -------- |
 | `4-2_function_calling_minimal.py` | 4-2「AnthropicSDKでFunction Callingを直接書く」/ 4-3「ツール定義とJSON Schema」 | tool_use → tool_result の一往復。キーなしでも往復の構造を表示するドライラン付き | 任意 |
 | `interactive_function_calling.py` | （本リポジトリ限定の追加教材。本文には登場しません） | 自分の質問でどのツールがどの引数で呼ばれるか（発火の有無・引数の埋まり方）の観察 | 観察には必要 |
 
@@ -77,7 +77,7 @@ python 4-2_function_calling_minimal.py
 キーを設定すると、実際に Claude が `get_stock` を使うかどうかを判断し、tool_use → tool_result の往復を経て最終回答まで進みます。
 
 ```bash
-export ANTHROPIC_API_KEY=sk-ant-...      # Windows (cmd) は set ANTHROPIC_API_KEY=...
+export ANTHROPIC_API_KEY=sk-ant-...      # Windows (cmd) は set ANTHROPIC_API_KEY=... Windows（powershell）は $env:ANTHROPIC_API_KEY="..."
 python 4-2_function_calling_minimal.py
 ```
 
