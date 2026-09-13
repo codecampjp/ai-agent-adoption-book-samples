@@ -15,6 +15,8 @@ APIキー・ネットワーク不要。検索は擬似データ、計画・統�
 
 from __future__ import annotations
 
+import json
+
 from typing import Annotated
 from typing_extensions import TypedDict
 
@@ -27,12 +29,10 @@ from langgraph.prebuilt import ToolNode, tools_condition
 from langgraph.types import Command, interrupt
 
 from _common import (
-    crm_lookup,
-    past_case_lookup,
+    search_result, decode_result,
     plan_review_reasons,
     pseudo_plan,
     pseudo_synthesize,
-    web_lookup,
 )
 
 
@@ -40,20 +40,19 @@ from _common import (
 @tool
 def web_search(query: str) -> str:
     """公開Web情報を検索する"""
-    return " / ".join(web_lookup(query)) or "（Web該当なし）"
+    return json.dumps(search_result("web_search", query), ensure_ascii=False)
 
 
 @tool
 def crm_search(query: str) -> str:
     """社内CRMを利用者の権限内で検索する"""
-    return " / ".join(crm_lookup(query)) or "（CRM該当なし）"
+    return json.dumps(search_result("crm_search", query), ensure_ascii=False)
 
 
 @tool
 def past_case_search(query: str) -> str:
     """過去案件ログ（自社RAG）を検索する"""
-    hits = past_case_lookup(query)
-    return " / ".join(f"[{c['id']}] {c['summary']}" for c in hits) or "（過去案件該当なし）"
+    return json.dumps(search_result("past_case_search", query), ensure_ascii=False)
 
 
 TOOLS = [web_search, crm_search, past_case_search]
@@ -135,7 +134,7 @@ def advance(state: State):
     step = state["plan"][state["step_idx"]]
     result = next(m.content for m in reversed(state["messages"])
                   if isinstance(m, ToolMessage))
-    finding = {"tool": step["tool"], "result": result}
+    finding = {"tool": step["tool"], "result": decode_result(result)}
     return {"findings": state["findings"] + [finding], "step_idx": state["step_idx"] + 1}
 
 

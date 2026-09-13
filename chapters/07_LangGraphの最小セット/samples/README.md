@@ -20,21 +20,21 @@
 | `7-6_checkpoint.py` | 7-6 | InMemorySaver＋`thread_id` で会話を継続。同じIDは前回を覚え、別IDはまっさら | 不要 |
 | `7-6_interrupt.py` | 7-6 | `interrupt` で止め、`Command(resume=値)` で再開するHITLの往復。承認・却下の両方を自動実演 | 不要 |
 | `interactive_interrupt.py` | （本文になし） | 7-6のinterruptを、実際にキーボードで承認/却下して体感する対話版。**本リポジトリ限定の追加教材** | 不要 |
-| `7-7_studio_app.py` ＋ `langgraph.json` | 7-7 | LangSmith Studioに映す可視化対象グラフ（7-5のループ）。単体実行でMermaid出力も可 | 不要 |
+| `7-7_studio_app.py` ＋ `langgraph.json` | 7-7 | LangSmith Studioに映す可視化対象グラフ（7-5のループ）。単体実行でMermaid出力も可 | 単体実行は不要。StudioはLangSmithの接続設定が必要 |
 
 ## 前提
 
-- Python 3.10 以上（動作確認は 3.12）
+- Python 3.12 を推奨（サンプル本体は 3.10 以上。Studioの開発サーバーは 3.11 以上が必要）
 - パッケージ管理は uv を推奨します（venv + pip でも同じことができます）
 - langgraph 0.2 以上／langchain-core 0.3 以上（`requirements.txt`）。第6章と違い、**ドライランにもこの2つのインストールが必要**です
 
 ## セットアップ
 
 ```bash
-cd samples
+cd chapters/07_LangGraphの最小セット/samples
 
 # uv の場合
-uv venv .venv
+uv venv --python 3.12 .venv
 uv pip install --python .venv -r requirements.txt
 source .venv/bin/activate        # Windows は .venv\Scripts\activate
 
@@ -46,7 +46,7 @@ pip install -r requirements.txt
 
 ## APIキーなしで動かす（ドライラン）
 
-すべてのサンプルはAPIキーなしで動きます。`7-5_` は擬似モデル（FakeReActModel）が「A-100を確認 → 品切れ → B-200を確認 → 在庫あり → 最終回答」というReActループを回し、それ以外はそもそもLLMを使いません。
+Pythonスクリプトの単体実行はAPIキーなしで動きます。StudioのWeb UIを使う場合のアカウント要件は後述します。`7-5_` は擬似モデル（FakeReActModel）が「A-100を確認 → 品切れ → B-200を確認 → 在庫あり → 最終回答」というReActループを回し、それ以外はそもそもLLMを使いません。
 
 ```bash
 python 7-3_minimal_graph.py
@@ -77,7 +77,7 @@ python 7-7_studio_app.py     # Studio に映すグラフ構造を Mermaid で出
 [AIMessage] 商品A-100は品切れですが、代替品B-200が15個あります。
 ```
 
-ダミー在庫は A-100=0（品切れ）、B-200=15（在庫あり）です。在庫値を書き換えると、ループの回り方が変わる様子を試せます。
+ダミー在庫は A-100=0（品切れ）、B-200=15（在庫あり）です。擬似モデルはこの在庫に対応する固定シナリオです。在庫値だけを書き換えても、呼び出し順と最終回答は変わりません。条件に応じた判断を試す場合は、下記の実モデルを使う手順を参照してください。
 
 ### `7-6_checkpoint.py`
 
@@ -145,8 +145,12 @@ python interactive_interrupt.py
 
 7-7のStudio可視化を手元で試すには、LangGraphのCLI（開発サーバ）を入れて `langgraph dev` を起動します。`langgraph.json` が `7-7_studio_app.py` のグラフを指しているので、7-5の「モデル→ツール→モデル」ループがStudioに図示されます。
 
+Python 3.12 の仮想環境を有効化して実行してください。uvで作った仮想環境にはpipが入っていないことがあるため、ここでは `uv pip` を使います。標準のvenvを使う場合は `python -m pip install -U "langgraph-cli[inmem]"` でも導入できます。
+
+[公式のローカル開発手順](https://docs.langchain.com/langsmith/local-dev-testing)ではLangSmithのAPIキーを前提としています。Studioにサインインし、必要なLangSmithの接続設定を行ってください。LLM用の `ANTHROPIC_API_KEY` とは別です。実行トレースを送信しない場合は `LANGSMITH_TRACING=false` にします。
+
 ```bash
-pip install -U "langgraph-cli[inmem]"
+uv pip install --python .venv -U "langgraph-cli[inmem]"
 langgraph dev        # samples フォルダで実行（langgraph.json を読む）
 ```
 
@@ -191,7 +195,7 @@ langgraph dev        # samples フォルダで実行（langgraph.json を読む�
 |------|------|
 | `ModuleNotFoundError: No module named 'langgraph'` | セットアップの手順で `requirements.txt` をインストールし、仮想環境を有効化した状態で実行してください |
 | `7-7_studio_app.py` の起動時に import エラー | `7-5_react_graph.py` を読み込みます。`samples` フォルダの中で実行してください |
-| `langgraph dev` が見つからない | `pip install -U "langgraph-cli[inmem]"` を実行してください（`requirements.txt` には含めていません） |
+| `langgraph dev` が見つからない | `uv pip install --python .venv -U "langgraph-cli[inmem]"` を実行してください（`requirements.txt` には含めていません） |
 | 本番モードにならない | `langchain` と `langchain-anthropic` の追加インストールと、同じシェルでの `ANTHROPIC_API_KEY` 設定を確認してください |
 | モデル名に関するエラー（`not_found_error` 等） | モデル名の世代交代です。`7-5_react_graph.py` の `init_chat_model(...)` を現行モデル名に書き換えてください |
 | `interactive_interrupt.py` で同じ金額を2回入力すると様子が違う | 実行ごとに `thread_id` を変えて新しいグラフを作っているため、通常は毎回同じ動きです。もし改造して `thread_id` を固定すると、完了済みスレッドを再利用してしまう点に注意してください |

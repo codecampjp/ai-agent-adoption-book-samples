@@ -82,7 +82,7 @@ def to_document(text: str) -> list[dict]:
     """
     rows: list[dict] = []
     chapter = "本文"
-    for line in text.splitlines():
+    for line_number, line in enumerate(text.splitlines(), 1):
         line = line.strip()
         if not line:
             continue
@@ -93,7 +93,7 @@ def to_document(text: str) -> list[dict]:
         rows.append({
             "document_id": DOCUMENT_ID,
             "document_version": DOCUMENT_VERSION,
-            "line": len(rows) + 1,
+            "line": line_number,
             "chapter": chapter,
             "text": line,
         })
@@ -131,26 +131,22 @@ def _make_live_worker(client):
             messages=[{"role": "user", "content": prompt}],
         )
         text = "".join(b.text for b in resp.content if b.type == "text")
-        start, end = text.find("["), text.rfind("]")
-        try:
-            items = json.loads(text[start:end + 1]) if 0 <= start < end else []
-        except json.JSONDecodeError:
-            items = []
+        if getattr(resp, "stop_reason", None) != "end_turn":
+            raise ValueError("応答が正常に完了していない")
+        # 配列全体を検証する。壊れた応答・途中で切れた応答を指摘0件と混同しない。
+        items = json.loads(text)
         if not isinstance(items, list):
-            items = []
-        if not items:
-            print(f"  [メモ] {viewpoint}Workerの指摘は0件（またはJSONとして解釈できず）でした。")
+            raise ValueError("JSON配列が必要")
         findings = []
         for it in items:
-            if not isinstance(it, dict):
-                continue
+            if (not isinstance(it, dict)
+                    or any(not isinstance(it.get(k), str) or not it[k].strip()
+                           for k in ("chapter", "excerpt", "issue"))
+                    or type(it.get("line")) is not int or it["line"] < 1
+                    or it.get("severity") not in ("高", "中", "低")):
+                raise ValueError("指摘の形式が不正")
             chapter = it.get("chapter", "不明")
             excerpt = it.get("excerpt", "")
-            # プロンプトでは「行N: 章名 本文」の形で見せているため、モデルが
-            # excerpt に章名ごと書き写すことがある。原文の text は章名を含まないので、
-            # 行頭の章名だけ確定的に剥がしてから validate_findings の照合に回す
-            if chapter != "不明" and excerpt.startswith(chapter):
-                excerpt = excerpt[len(chapter):].lstrip()
             findings.append({
                 "document_id": DOCUMENT_ID,
                 "document_version": DOCUMENT_VERSION,
@@ -172,7 +168,14 @@ def build_graph(worker_fn):
     """13-2 と同じグラフを、Workerの実装だけ差し替え可能にして組む。"""
     def make_node(viewpoint: str):
         def node(state):
-            return {"findings": worker_fn(viewpoint, state["document"])}
+            try:
+                return {"findings": worker_fn(viewpoint, state["document"])}
+            except Exception as exc:
+                # 応答本文やAPIエラー詳細は載せず、失敗した観点と再実行要否を残す。
+                return {"findings": [], "worker_errors": [{
+                    "viewpoint": viewpoint, "reason": type(exc).__name__,
+                    "retry": "未実施。応答形式・接続設定を確認して再実行する",
+                }]}
         return node
 
     b = StateGraph(_pipeline.State)
@@ -211,7 +214,7 @@ def review(graph, text: str) -> None:
         return
     chapters = list(dict.fromkeys(r["chapter"] for r in document))
     print(f"\n文書 {len(document)}行（章立て: {chapters}）を3観点で並列レビューします。")
-    out = graph.invoke({"document": document, "findings": []},
+    out = graph.invoke({"document": document, "findings": [], "worker_errors": []},
                        {"recursion_limit": 50})
     print(f"  集まった指摘: {len(out['findings'])}件 / "
           f"根拠を確認できた指摘: {len(out['valid_findings'])}件 / "

@@ -32,6 +32,7 @@ from _common import (numbered_document, pseudo_worker_analyze, pseudo_integrate,
 class State(TypedDict, total=False):
     document: list          # レビュー対象の文書（行番号つき）
     findings: Annotated[list, operator.add]  # 各Workerの指摘（並列なので reducer で集約）
+    worker_errors: Annotated[list, operator.add]  # 失敗した観点（指摘0件とは別）
     valid_findings: list    # 検証（参照の実在チェック）を通った指摘だけ
     rejected_findings: list # 検証で弾かれた指摘（実在しない章・行・抜粋を指すもの）
     report: str             # 統合レポート
@@ -74,6 +75,7 @@ def integrate(state: State):
     return {"report": pseudo_integrate(
         state["valid_findings"],
         state["rejected_findings"],
+        state.get("worker_errors", []),
     )}
 
 

@@ -11,6 +11,8 @@ Web検索、CRM検索、過去案件検索の各ツールに、擬似モデル�
 
 from __future__ import annotations
 
+import json
+
 # --- ダミーの3つの情報源 -----------------------------------------------------
 # 顧客企業「みらい物流」を例に、商談準備の材料を用意する。
 
@@ -61,7 +63,43 @@ def past_case_lookup(query: str) -> list[dict]:
     """過去案件ログの検索（自社RAGの代役）。業種キーワードで類似事例を返す（出典id付き）。"""
     industries = {v for k, v in _INDUSTRY_KEYWORDS.items() if k in query}
     hits = [c for c in PAST_CASES if c["industry"] in industries]
-    return hits or PAST_CASES[:1]
+    return hits
+
+
+# 本文12-6の共通形式。出典IDは架空データの識別子であり、実在するURLではない。
+def search_result(tool_name: str, query: str) -> dict:
+    lookups = {"web_search": web_lookup, "crm_search": crm_lookup,
+               "past_case_search": past_case_lookup}
+    result = {"status": "not_found", "content": [],
+              "source_id": f"dummy:{tool_name}", "updated_at": None,
+              "source_url": None}
+    try:
+        hits = lookups[tool_name](query)
+        result["content"] = [
+            f"[{h['id']}] {h['summary']}" if isinstance(h, dict) else h
+            for h in hits
+        ]
+        result["status"] = "ok" if hits else "not_found"
+    except PermissionError:
+        result.update(status="forbidden", reason="情報源へのアクセス権限がない")
+    except Exception:
+        result.update(status="error", reason="情報源の取得に失敗した")
+    return result
+
+
+def decode_result(content: str) -> dict:
+    """ToolMessageのJSONを復元する。壊れた応答は情報として使わない。"""
+    try:
+        result = json.loads(content)
+        if (isinstance(result, dict)
+                and result.get("status") in {"ok", "not_found", "error", "forbidden"}
+                and isinstance(result.get("content"), list)
+                and all(isinstance(item, str) for item in result["content"])
+                and (result["status"] != "ok" or result["content"])):
+            return result
+    except (ValueError, TypeError):
+        pass
+    return {"status": "error", "content": [], "reason": "ツール応答の形式が不正"}
 
 
 # --- 擬似モデル ---------------------------------------------------------------
@@ -80,7 +118,7 @@ def pseudo_plan(goal: str) -> list[dict]:
         {"desc": f"{company}との過去のやり取りをCRMで確認する",
          "tool": "crm_search", "arg": f"{company} 過去 案件 やり取り"},
         {"desc": f"{company}と似た業種への過去提案を探す",
-         "tool": "past_case_search", "arg": "物流 倉庫 配送 の過去提案"},
+         "tool": "past_case_search", "arg": f"{company} の過去提案"},
     ]
 
 
@@ -114,8 +152,9 @@ def pseudo_synthesize(goal: str, findings: list[dict]) -> dict:
     def _texts(tool: str) -> list[str]:
         out: list[str] = []
         for f in findings:
-            if f["tool"] == tool:
-                out.extend(f["result"] if isinstance(f["result"], list) else [str(f["result"])])
+            result = f["result"]
+            if f["tool"] == tool and result.get("status") == "ok":
+                out.extend(result["content"])
         return out
 
     web = _texts("web_search")
@@ -127,10 +166,10 @@ def pseudo_synthesize(goal: str, findings: list[dict]) -> dict:
         memo = memo.rstrip("。") + "。過去の経緯：" + "／".join(crm)
 
     expected_questions = [
-        "初期費用の負担感が見送り理由でしたが、月額型なら検討余地はありますか？" if crm else "ご予算とご要望の優先順位を教えてください。",
+        "初期費用の負担感が見送り理由でしたが、月額型なら検討余地はありますか？" if any("初期費用が高い" in t for t in crm) else "ご予算とご要望の優先順位を教えてください。",
     ]
     questions_to_ask = [
-        "新倉庫の稼働に合わせて、配送の課題で急ぎのものはありますか？" if web else "現在いちばんお困りの業務は何でしょうか？",
+        "新倉庫の稼働に合わせて、配送の課題で急ぎのものはありますか？" if any("新倉庫" in t for t in web) else "現在いちばんお困りの業務は何でしょうか？",
     ]
 
     proposal = "提案骨子：" + ("／".join(cases) if cases else "未確認（類似案件が見つからず）")
@@ -141,6 +180,11 @@ def pseudo_synthesize(goal: str, findings: list[dict]) -> dict:
         unresolved.append("CRM情報を取得できていない")
     if not cases:
         unresolved.append("類似する過去案件を確認できていない")
+    labels = {"not_found": "該当なし", "error": "取得失敗", "forbidden": "権限不足"}
+    for finding in findings:
+        result = finding["result"]
+        if result["status"] != "ok":
+            unresolved.append(f"{finding['tool']}: {labels[result['status']]}")
     sources = {
         "公開Web": web,
         "CRM": crm,

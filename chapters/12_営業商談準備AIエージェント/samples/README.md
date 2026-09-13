@@ -131,3 +131,13 @@ python interactive_meeting_prep.py
 - **キーを設定したのに interactive が擬似モデルのまま**: `anthropic` パッケージの導入と、`export ANTHROPIC_API_KEY=...` を実行したシェルと同じシェルで実行しているか（`echo $ANTHROPIC_API_KEY`）を確認してください
 - **本番モードで「JSONとして解釈できなかった」と表示される**: 異常ではなくフォールバックです。モデルが指定の形式で返さなかった場合は擬似Planner／擬似Synthesizerに切り替えて続行します
 - **`not_found_error` などモデル名に関するAPIエラー**: モデルが廃止された可能性があります。`interactive_meeting_prep.py` の `MODEL` を現行のモデル名に書き換えてください
+
+## 検索結果の状態と回帰テスト
+
+ツールは `status`（`ok` / `not_found` / `error` / `forbidden`）、`content`、`source_id`、`updated_at`、`source_url` を持つJSONを返します。ToolMessageから復元した形式をfindingsに保存し、`ok` の内容だけを根拠に使います。該当なし・取得失敗・権限不足は未確認事項に残します。ダミー情報源の出典IDは `dummy:` で始まり、実在するURLや更新日時を捏造しないよう後者2項目は `null` です。
+
+過去案件は業種キーワードが一致した場合だけ返します。「架空商事 新規提案」では3情報源とも該当なしとなり、他社の倉庫稼働や失注理由を補いません。
+
+```bash
+python -m unittest discover -p "test_*.py" -v
+```

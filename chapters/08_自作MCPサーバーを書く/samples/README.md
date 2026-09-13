@@ -37,7 +37,7 @@
 ## セットアップ
 
 ```bash
-cd samples
+cd chapters/08_自作MCPサーバーを書く/samples
 
 # uv の場合
 uv venv .venv
