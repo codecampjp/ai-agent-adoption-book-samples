@@ -98,26 +98,32 @@ def pseudo_worker_analyze(viewpoint: str, document: list[dict]) -> list[dict]:
 
 
 # --- 擬似Supervisorモデル ----------------------------------------------------
-def pseudo_integrate(findings: list[dict], rejected: list[dict] | None = None) -> str:
+def pseudo_integrate(findings: list[dict], rejected: list[dict] | None = None,
+                     worker_errors: list[dict] | None = None) -> str:
     """集まった全指摘を、観点ごとにまとめた統合レポートの文字列にする。
 
     本文13-6の統合処理の代役。有効な指摘には文書内参照を添え、
     根拠不一致の指摘は未確認事項として分ける。
     """
+    worker_errors = worker_errors or []
+    rejected = rejected or []
     order = ["法務", "業務要件", "技術妥当性"]
     lines = ["# 文書レビュー統合レポート", ""]
     for vp in order:
         items = [f for f in findings if f["viewpoint"] == vp]
         lines.append(f"## {vp}の観点（{len(items)}件）")
-        if not items:
-            lines.append("- 指摘なし")
+        if any(e["viewpoint"] == vp for e in worker_errors):
+            lines.append("- 未確認（Worker失敗のためレビュー未完了）")
+        elif not items:
+            lines.append("- 根拠未確認の指摘あり" if any(
+                f.get("viewpoint") == vp for f in rejected) else "- 指摘なし")
         for f in items:
             ref = f"{f['chapter']} 行{f['line']}"
             lines.append(f"- [{f['severity']}] {f['issue']}（根拠: {ref}「{f['excerpt']}」）")
         lines.append("")
     rejected = rejected or []
-    lines.append(f"## 根拠不一致・未確認（{len(rejected)}件）")
-    if not rejected:
+    lines.append(f"## 根拠不一致・未確認（{len(rejected) + len(worker_errors)}件）")
+    if not rejected and not worker_errors:
         lines.append("- なし")
     for f in rejected:
         lines.append(
@@ -125,6 +131,9 @@ def pseudo_integrate(findings: list[dict], rejected: list[dict] | None = None) -
             f"{f.get('issue', '指摘内容なし')} "
             f"（申告された参照: {f.get('chapter', '不明')} 行{f.get('line', '不明')}）"
         )
+    for error in worker_errors:
+        lines.append(f"- [{error['viewpoint']}] Worker失敗: {error['reason']}。"
+                     f"再実行: {error['retry']}")
     return "\n".join(lines).rstrip()
 
 

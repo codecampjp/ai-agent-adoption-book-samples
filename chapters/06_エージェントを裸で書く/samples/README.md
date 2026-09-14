@@ -89,7 +89,7 @@ python 6-5_agent_loop_observable.py
 セットアップ済みの環境でAPIキーを設定すると、実際にClaudeがループを自走させます。
 
 ```bash
-export ANTHROPIC_API_KEY=sk-ant-...      # Windows（cmd）は set ANTHROPIC_API_KEY=... Windows（powershell）は $env:ANTHROPIC_API_KEY="..." 
+export ANTHROPIC_API_KEY=sk-ant-...      # Windows（cmd）は set ANTHROPIC_API_KEY=... Windows（powershell）は $env:ANTHROPIC_API_KEY="..."
 python 6-3_agent_loop_minimal.py
 python 6-4_agent_loop_observable.py
 python 6-5_agent_loop_observable.py

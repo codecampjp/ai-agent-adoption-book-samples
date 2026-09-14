@@ -146,6 +146,14 @@ APIキーありのときは自由なテキストに対する指摘が得られ�
 - **擬似 Worker で指摘が0件になる**: 異常ではありません。キーワード規則（上記6語）に反応しなかっただけです。本番モードなら自由な文書にも指摘が付きます
 - **`USE_CLAUDE_AGENT_SDK=1` で `ModuleNotFoundError: No module named 'claude_agent_sdk'`**: `pip install claude-agent-sdk` を実行してください（`requirements.txt` には含めていません）
 - **キーを設定したのに interactive が擬似 Worker のまま**: `anthropic` パッケージの導入と、`export ANTHROPIC_API_KEY=...` を実行したシェルと同じシェルで実行しているか（`echo $ANTHROPIC_API_KEY`）を確認してください
-- **本番モードで「指摘は0件（またはJSONとして解釈できず）」と表示される**: モデルが指定のJSON形式で返さなかった場合、その観点の指摘は0件として続行します。もう一度実行するか、文書を短くして試してください
+- **「Worker失敗」「レビュー未完了」と表示される**: APIエラー、未完了の応答、不正なJSONや指摘形式は「指摘なし」とは区別されます。失敗した観点・例外の種類・再実行要否を未確認事項に残し、成功した観点の結果を保持します。接続設定と応答形式を確認し、必要なら文書を短くして再実行してください。正常に完了して `[]` が返った場合だけ、その観点を指摘0件として扱います
 - **`not_found_error` などモデル名に関するAPIエラー**: モデルが廃止された可能性があります。`interactive_doc_review.py` の `MODEL`（または 13-5 の `ClaudeAgentOptions`）を現行のモデル名に合わせてください
 - **日本語が文字化けする（Windows）**: `set PYTHONUTF8=1` を設定するか `-X utf8` を付けて実行してください
+
+## 回帰テスト（APIキー不要）
+
+```bash
+python -m unittest discover -p "test_*.py" -v
+```
+
+空行を含むファイルでも、参照には元ファイルの行番号を使います。

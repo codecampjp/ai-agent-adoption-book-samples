@@ -34,6 +34,12 @@ def build_collection() -> "chromadb.api.models.Collection.Collection":
             "社外秘データは指定の暗号化ストレージに保管し、パスワードは90日ごとに変更してください。",
         ],
         ids=["doc1", "doc2", "doc3"],
+        # 文書と同じ順序で出典・版を付ける（すべて架空の教材データ）。
+        metadatas=[
+            {"source_id": "sample-leave-policy", "version": "v1", "section": "休暇"},
+            {"source_id": "sample-expense-policy", "version": "v1", "section": "経費"},
+            {"source_id": "sample-security-policy", "version": "v1", "section": "情報管理"},
+        ],
     )
     return collection
 
@@ -50,6 +56,7 @@ def main() -> None:
         result = collection.query(query_texts=[q], n_results=1)
         print(f"Q: {q}")
         print(f" -> {result['documents'][0][0]}")
+        print(f" 出典: {result['metadatas'][0][0]}")
 
 
 if __name__ == "__main__":

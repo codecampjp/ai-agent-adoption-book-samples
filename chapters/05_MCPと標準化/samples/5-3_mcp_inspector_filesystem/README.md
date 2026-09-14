@@ -19,12 +19,14 @@
 
 どちらも `npx` 実行時に取得されるため、事前インストールは基本不要です。
 
+検証対象を Inspector **2.6.0** / filesystem server **2026.8.31** に固定しています。[公式手順](https://modelcontextprotocol.io/docs/tools/inspector)のNode.js要件は22.19.0以上です。
+
 ## 前提：Node.js
 
 `npx` コマンドを使うためNode.jsが必要です。未導入なら [Node.js公式サイト](https://nodejs.org/) から**LTS版**を入れてください。導入確認は次のとおりです。
 
 ```bash
-node -v   # v20 以降の表示が出ればOK
+node -v   # v22.19.0 以上の表示が出ればOK
 npx -v
 ```
 
@@ -39,23 +41,23 @@ Pythonは使いません。APIキーも不要です。
 mkdir -p ~/mcp-test
 echo "hello mcp" > ~/mcp-test/sample.txt
 
-# Inspector を起動し、その中で filesystem サーバーを立ち上げて自動接続
-npx @modelcontextprotocol/inspector npx -y @modelcontextprotocol/server-filesystem ~/mcp-test
+# Inspector を起動し、filesystem サーバーを接続先として渡す
+npx -y @modelcontextprotocol/inspector@2.6.0 npx -y @modelcontextprotocol/server-filesystem@2026.8.31 ~/mcp-test
 ```
 
-少し待つと、ブラウザでInspectorの画面（既定 `http://localhost:6274`）が開きます。
+起動時に表示されたURLをブラウザで開きます。URLにセッショントークンが含まれる場合は、そのまま開き、共有する画像には含めないでください。サーバー横の接続スイッチをオンにし、Connectedになったら上部の **Tools** を開きます。
 
 ## 見るべきポイント
 
 1. サーバーに接続すると、`tools/list` の結果として**ツール一覧**（ファイル読み取り・一覧・検索・書き込み・編集・移動など）が表示されます。それぞれに、第4章で見たのと同じ名前・説明・入力スキーマ（引数の形）が付いていることを確認してください
-2. 「ファイル読み取り」のツールを選び、引数に `~/mcp-test/sample.txt` のパスを入れて実行すると（これが `tools/call`）、`hello mcp` という中身が結果として返ります
+2. **Read Text File（read_text_file）** を選び、引数に `sample.txt` の絶対パス（例：`/Users/yourname/mcp-test/sample.txt`）を入れて実行すると（これが `tools/call`）、`hello mcp` という中身が結果として返ります
 3. ここまでで、ファイルシステムサーバーのコードを**1行も書いていない**ことに注目してください。公開済みのサーバーに共通のプロトコルでつないだだけで、その機能をそのまま使えました。これが本文5-1〜5-2の「標準化のうまみ」の実体です
 
 ## うまくいかないとき
 
 | 症状 | 対処 |
 |------|------|
-| ブラウザ画面が開かない・ポート競合 | `6274` が使用中ならInspectorが別ポートを案内します。ターミナルに表示されたURLを開いてください |
+| ブラウザ画面が開かない・ポート競合 | ターミナルのエラーと表示URLを確認してください。起動中の別のInspectorとポートが重複していないか確認します |
 | `tools/call` がパスのエラーになる | 対象にできるのは、起動時に許可したフォルダ（ここでは `~/mcp-test`）の中だけです。フルパスで指定すると確実です |
 | `npx` が見つからない | Node.jsのインストールと、ターミナルの開き直しを確認してください |
 | 画面の構成が本手順と違う | Inspectorは更新されます。冒頭の注意のとおり、公式ドキュメントで現行の手順を確認してください |
@@ -80,3 +82,11 @@ npx @modelcontextprotocol/inspector npx -y @modelcontextprotocol/server-filesyst
 ## 安全上の注意（重要）
 
 filesystemサーバーは、許可フォルダ内を**あなたのユーザー権限で**読み書きします。つまり、あなたが手でできるファイル操作は何でも実行され得ます。許可は練習用の空フォルダだけにとどめ、ホームフォルダ全体や業務データの場所を丸ごと渡さないでください。「MCPサーバーに何を任せると、どこまでの権限を渡すことになるか」を体感する題材でもあります（権限設計の詳細は第15章）。
+
+## 検証時の画面（2026-09-14）
+
+Node.js 22.21.1 / Inspector 2.6.0 / filesystem server 2026.8.31。練習用ファイルのみを使い、ツール一覧の取得と `read_text_file` の実行を確認しました。
+
+![ツール一覧とread_text_fileの引数](images/inspector-tools.png)
+
+![tools/callでhello mcpが返った実画面](images/inspector-read-result.png)

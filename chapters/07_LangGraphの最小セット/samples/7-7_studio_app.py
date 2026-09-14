@@ -10,11 +10,12 @@ LangSmith Studio（旧称 LangGraph Studio）を開くと、自分が組んだ�
 可視化対象として公開する。
 
 使い方（詳細は README の 7-7 節）:
-    pip install -U "langgraph-cli[inmem]"
+    uv pip install --python .venv -U "langgraph-cli[inmem]"
     langgraph dev              # 同じフォルダの langgraph.json を読んで開発サーバを起動
     # 起動時に表示される URL をブラウザで開くと、Studio にこのグラフが表示される
 
-APIキーは不要。7-5 と同じく、ANTHROPIC_API_KEY があれば実モデル、なければ
+単体実行はAPIキー不要。Studioのアカウント・LangSmith接続設定はREADMEを参照。
+7-5 と同じく、ANTHROPIC_API_KEY があれば実モデル、なければ
 擬似モデル（FakeReActModel）で動く。どちらでも Studio に映るグラフ構造は同じ。
 
 このファイルを直接 `python 7-7_studio_app.py` で実行すると、Studio に映る前に
@@ -76,7 +77,7 @@ def main():
     print(graph.get_graph().draw_mermaid())
     print(
         "Studio で図として見るには（README 7-7 節）:\n"
-        '  pip install -U "langgraph-cli[inmem]"\n'
+        '  uv pip install --python .venv -U "langgraph-cli[inmem]"\n'
         "  langgraph dev\n"
         "  → 表示された URL をブラウザで開く"
     )

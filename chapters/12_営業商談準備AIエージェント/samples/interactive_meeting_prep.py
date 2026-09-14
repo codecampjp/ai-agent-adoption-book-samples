@@ -130,6 +130,7 @@ def _make_live_synthesizer(client):
             f"# 調査結果（findings）\n{findings}\n\n"
             "JSONオブジェクトだけを出力してください。キーは「準備メモ」「想定質問」"
             "「確認したい質問」「提案骨子」「未確認事項と出典」の5つ。"
+            "statusがokのcontentだけを根拠に使い、それ以外の状態は未確認事項に残してください。"
             "調査結果に無いことは推測で埋めず、「未確認」と明記してください。"
         )
         resp = client.messages.create(
