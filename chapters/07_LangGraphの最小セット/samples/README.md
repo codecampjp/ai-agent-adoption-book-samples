@@ -14,7 +14,7 @@
 ## 収録ファイル
 
 | ファイル | 本文の節 | 確かめられること | APIキー |
-|---------|---------|----------------|--------|
+| --------- | --------- | ---------------- | -------- |
 | `7-3_minimal_graph.py` | 7-3 | 状態1つ・1ノードの最小グラフ。4ステップ（状態→ノード→エッジ→コンパイル）の型 | 不要 |
 | `7-5_react_graph.py` | 7-5 | 手書きReActをStateGraphで組み直した版。モデルノード・ツールノード・条件分岐・戻り線 | なしでドライラン可（擬似モデル） |
 | `7-6_checkpoint.py` | 7-6 | InMemorySaver＋`thread_id` で会話を継続。同じIDは前回を覚え、別IDはまっさら | 不要 |
@@ -24,24 +24,86 @@
 
 ## 前提
 
-- Python 3.12 を推奨（サンプル本体は 3.10 以上。Studioの開発サーバーは 3.11 以上が必要）
+- Python **3.12.12 を推奨**。以下のuv手順で検証に使ったバージョンを指定できます（Studioの開発サーバーは3.11以上が必要）
 - パッケージ管理は uv を推奨します（venv + pip でも同じことができます）
 - langgraph 0.2 以上／langchain-core 0.3 以上（`requirements.txt`）。第6章と違い、**ドライランにもこの2つのインストールが必要**です
 
 ## セットアップ
 
+リポジトリのルートから、使っているOS・シェルに対応するブロックだけを実行してください。
+
+### uv を使う場合（推奨：Python 3.12.12を指定）
+
+`uv python install` でPython 3.12.12を用意し、`uv venv --python 3.12.12` でそのバージョンの仮想環境を作ります。仮想環境を有効化した後、`python --version` が `Python 3.12.12` と表示されることを確認してから、依存パッケージを導入してください。
+
+macOS / Linux（bash・zsh）:
+
 ```bash
 cd chapters/07_LangGraphの最小セット/samples
+uv python install 3.12.12
+uv venv --python 3.12.12
+source .venv/bin/activate
+python --version
+uv pip install -r requirements.txt
+```
 
-# uv の場合
-uv venv --python 3.12 .venv
-uv pip install --python .venv -r requirements.txt
-source .venv/bin/activate        # Windows は .venv\Scripts\activate
+Windows（コマンドプロンプト / cmd）:
 
-# venv + pip の場合
+```bat
+cd chapters/07_LangGraphの最小セット/samples
+uv python install 3.12.12
+uv venv --python 3.12.12
+.venv\Scripts\activate.bat
+python --version
+uv pip install -r requirements.txt
+```
+
+Windows（PowerShell）:
+
+```powershell
+cd chapters/07_LangGraphの最小セット/samples
+uv python install 3.12.12
+uv venv --python 3.12.12
+.\.venv\Scripts\Activate.ps1
+python --version
+uv pip install -r requirements.txt
+```
+
+### uv がない場合（標準の venv + pip）
+
+Python 3.12.12が既にインストールされている方向けです。最初のバージョン確認で `Python 3.12.12` と表示されることを確認してから、仮想環境を作成してください。別のバージョンが表示される場合は、上のuv手順を使うと3.12.12を指定できます。有効化後にも同じバージョンが表示されることを確認します。
+
+macOS / Linux（bash・zsh）:
+
+```bash
+cd chapters/07_LangGraphの最小セット/samples
+python3 --version
 python3 -m venv .venv
-source .venv/bin/activate        # Windows は .venv\Scripts\activate
-pip install -r requirements.txt
+source .venv/bin/activate
+python --version
+python -m pip install -r requirements.txt
+```
+
+Windows（コマンドプロンプト / cmd）:
+
+```bat
+cd chapters/07_LangGraphの最小セット/samples
+python --version
+python -m venv .venv
+.venv\Scripts\activate.bat
+python --version
+python -m pip install -r requirements.txt
+```
+
+Windows（PowerShell）:
+
+```powershell
+cd chapters/07_LangGraphの最小セット/samples
+python --version
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python --version
+python -m pip install -r requirements.txt
 ```
 
 ## APIキーなしで動かす（ドライラン）
@@ -115,9 +177,40 @@ python 7-7_studio_app.py     # Studio に映すグラフ構造を Mermaid で出
 
 `7-5_react_graph.py` だけは、APIキーを設定すると擬似モデルの代わりに実際のClaudeがループを自走させます。追加で `langchain` と `langchain-anthropic` が必要です。
 
+仮想環境を有効化した状態で、セットアップ時に選んだ方法に合わせて追加パッケージを導入します。
+
+uvの場合（全シェル共通）:
+
+```text
+uv pip install --python .venv langchain langchain-anthropic
+```
+
+標準venvの場合（全シェル共通）:
+
+```text
+python -m pip install langchain langchain-anthropic
+```
+
+続いて、使っているシェルのブロックだけを実行します。`sk-ant-...` は自分のAPIキーに置き換えてください。
+
+macOS / Linux（bash・zsh）:
+
 ```bash
-pip install langchain langchain-anthropic   # uv の場合: uv pip install --python .venv langchain langchain-anthropic
-export ANTHROPIC_API_KEY=sk-ant-...         # Windows は set ANTHROPIC_API_KEY=...
+export ANTHROPIC_API_KEY="sk-ant-..."
+python 7-5_react_graph.py
+```
+
+Windows（コマンドプロンプト / cmd）:
+
+```bat
+set "ANTHROPIC_API_KEY=sk-ant-..."
+python 7-5_react_graph.py
+```
+
+Windows（PowerShell）:
+
+```powershell
+$env:ANTHROPIC_API_KEY="sk-ant-..."
 python 7-5_react_graph.py
 ```
 
@@ -145,7 +238,7 @@ python interactive_interrupt.py
 
 7-7のStudio可視化を手元で試すには、LangGraphのCLI（開発サーバ）を入れて `langgraph dev` を起動します。`langgraph.json` が `7-7_studio_app.py` のグラフを指しているので、7-5の「モデル→ツール→モデル」ループがStudioに図示されます。
 
-Python 3.12 の仮想環境を有効化して実行してください。uvで作った仮想環境にはpipが入っていないことがあるため、ここでは `uv pip` を使います。標準のvenvを使う場合は `python -m pip install -U "langgraph-cli[inmem]"` でも導入できます。
+Python 3.12.12 の仮想環境を有効化して実行してください。uvで作った仮想環境にはpipが入っていないことがあるため、ここでは `uv pip` を使います。標準のvenvを使う場合は `python -m pip install -U "langgraph-cli[inmem]"` でも導入できます。
 
 [公式のローカル開発手順](https://docs.langchain.com/langsmith/local-dev-testing)ではLangSmithのAPIキーを前提としています。Studioにサインインし、必要なLangSmithの接続設定を行ってください。LLM用の `ANTHROPIC_API_KEY` とは別です。実行トレースを送信しない場合は `LANGSMITH_TRACING=false` にします。
 
@@ -192,7 +285,7 @@ langgraph dev        # samples フォルダで実行（langgraph.json を読む�
 ## うまくいかないとき
 
 | 症状 | 対処 |
-|------|------|
+| ------ | ------ |
 | `ModuleNotFoundError: No module named 'langgraph'` | セットアップの手順で `requirements.txt` をインストールし、仮想環境を有効化した状態で実行してください |
 | `7-7_studio_app.py` の起動時に import エラー | `7-5_react_graph.py` を読み込みます。`samples` フォルダの中で実行してください |
 | `langgraph dev` が見つからない | `uv pip install --python .venv -U "langgraph-cli[inmem]"` を実行してください（`requirements.txt` には含めていません） |

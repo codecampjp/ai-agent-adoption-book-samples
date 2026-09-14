@@ -8,35 +8,93 @@
 ## 収録ファイル
 
 | ファイル | 対応する本文の節 | 確かめられること | APIキー |
-|---------|----------------|----------------|--------|
+| --------- | ---------------- | ---------------- | -------- |
 | `3-3_rag_minimal.py` | 3-3「手を動かす：Chromaで最小のRAGを組む」 | 取り込み→検索。日本語の意味検索と、文書に付けた出典ID・版・節のメタデータを取り出せること | 不要 |
 | `3-4_rag_with_generation.py` | 3-4「チャンク分割と検索結果の渡し方」（後半の生成部分） | 検索結果を「参考文書」欄に差し込んだプロンプトの組み立て。キーがあれば Claude での回答生成まで | 任意 |
 | `interactive_rag.py` | （本リポジトリ限定の追加教材。本文には登場しません） | 自分で考えた質問での検索・生成の試行 | 検索のみなら不要 |
 
 ## 前提
 
-- Python 3.10 以上（3.10〜3.12 で動作確認）
+- Python **3.12.12 を推奨**。今回の検証に使ったバージョンです。以下のuv手順で指定できます
 - パッケージ管理は [uv](https://docs.astral.sh/uv/) を推奨します。uv がない場合は標準の `venv` + `pip` でも同じ手順で動きます
 - 動作確認バージョン: chromadb 1.5.x / sentence-transformers 5.x（`requirements.txt` に記載）
 
 ## セットアップ
 
-uv を使う場合:
+リポジトリのルートから、使っているOS・シェルに対応するブロックだけを実行してください。仮想環境の有効化は、以降の章でも同じ使い分けになります。
+
+### uv を使う場合（推奨：Python 3.12.12を指定）
+
+`uv python install` でPython 3.12.12を用意し、`uv venv --python 3.12.12` でそのバージョンの仮想環境を作ります。仮想環境を有効化した後、`python --version` が `Python 3.12.12` と表示されることを確認してから、依存パッケージを導入してください。
+
+macOS / Linux（bash・zsh）:
 
 ```bash
 cd chapters/03_ベクターDBとRAG/samples
-uv venv
-source .venv/bin/activate        # Windows は .venv\Scripts\activate
+uv python install 3.12.12
+uv venv --python 3.12.12
+source .venv/bin/activate
+python --version
 uv pip install -r requirements.txt
 ```
 
-uv がない場合（標準の venv + pip）:
+Windows（コマンドプロンプト / cmd）:
+
+```bat
+cd chapters/03_ベクターDBとRAG/samples
+uv python install 3.12.12
+uv venv --python 3.12.12
+.venv\Scripts\activate.bat
+python --version
+uv pip install -r requirements.txt
+```
+
+Windows（PowerShell）:
+
+```powershell
+cd chapters/03_ベクターDBとRAG/samples
+uv python install 3.12.12
+uv venv --python 3.12.12
+.\.venv\Scripts\Activate.ps1
+python --version
+uv pip install -r requirements.txt
+```
+
+### uv がない場合（標準の venv + pip）
+
+Python 3.12.12が既にインストールされている方向けです。最初のバージョン確認で `Python 3.12.12` と表示されることを確認してから、仮想環境を作成してください。別のバージョンが表示される場合は、上のuv手順を使うと3.12.12を指定できます。有効化後にも同じバージョンが表示されることを確認します。
+
+macOS / Linux（bash・zsh）:
 
 ```bash
 cd chapters/03_ベクターDBとRAG/samples
+python3 --version
 python3 -m venv .venv
-source .venv/bin/activate        # Windows は .venv\Scripts\activate
-pip install -r requirements.txt
+source .venv/bin/activate
+python --version
+python -m pip install -r requirements.txt
+```
+
+Windows（コマンドプロンプト / cmd）:
+
+```bat
+cd chapters/03_ベクターDBとRAG/samples
+python --version
+python -m venv .venv
+.venv\Scripts\activate.bat
+python --version
+python -m pip install -r requirements.txt
+```
+
+Windows（PowerShell）:
+
+```powershell
+cd chapters/03_ベクターDBとRAG/samples
+python --version
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python --version
+python -m pip install -r requirements.txt
 ```
 
 ## APIキーなしで確認する（ドライラン）
@@ -76,13 +134,42 @@ python 3-4_rag_with_generation.py
 
 3-4 の「生成」まで試す場合は、`anthropic` パッケージと Anthropic の API キーが必要です。
 
+まず、セットアップで選んだ方法に合わせて `anthropic` を導入します。仮想環境を有効化した、第3章の `samples` フォルダで実行してください。
+
+uv を使った場合（全シェル共通）:
+
+```text
+uv pip install anthropic
+```
+
+標準の venv を使った場合（全シェル共通）:
+
+```text
+python -m pip install anthropic
+```
+
+次に、使っているシェルのブロックだけを実行します。`sk-ant-...` は自分のAPIキーに置き換えてください。
+
+macOS / Linux（bash・zsh）:
+
 ```bash
-pip install anthropic                    # uv でセットアップした場合は: uv pip install anthropic
-export ANTHROPIC_API_KEY=sk-ant-...      # Windows (cmd) は set ANTHROPIC_API_KEY=...
+export ANTHROPIC_API_KEY="sk-ant-..."
 python 3-4_rag_with_generation.py
 ```
 
-> uv の `uv venv` で作った仮想環境には `pip` コマンドが入っていません。uv でセットアップした場合は `pip install ...` の代わりに `uv pip install ...` を使ってください。
+Windows（コマンドプロンプト / cmd）:
+
+```bat
+set "ANTHROPIC_API_KEY=sk-ant-..."
+python 3-4_rag_with_generation.py
+```
+
+Windows（PowerShell）:
+
+```powershell
+$env:ANTHROPIC_API_KEY="sk-ant-..."
+python 3-4_rag_with_generation.py
+```
 
 プロンプト表示に続けて「=== Claude の回答 ===」として、参考文書に基づいた回答が表示されます。
 
