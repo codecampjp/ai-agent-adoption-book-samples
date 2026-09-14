@@ -8,7 +8,7 @@
 ## 収録ファイル
 
 | ファイル | 対応する本文の節 | 確かめられること | APIキー |
-|---------|----------------|----------------|--------|
+| --------- | ---------------- | ---------------- | -------- |
 | `_common.py` | 11-3「権限チェックをどこで行うか」/ 11-6「ハイブリッド検索を組み込む」 | 共通部品（ダミー社内コーパス、擬似ベクトル＋キーワード検索、RRF、リランキング、権限判定 `can_view`）。単体実行はしない | 不要 |
 | `11-2_agent_pipeline.py` | 11-2〜11-7 | 検索Subgraph → 権限チェック＋Conditional Edge → 回答＋引用付与を1本につないだ全体版 | 不要 |
 | `11-3_permission_filter.py` | 11-3「権限チェックをどこで行うか」 | 同じ質問でも利用者の権限で見える文書が変わること。閲覧可0件なら「見つかりません」経路へ落ちること | 不要 |
@@ -121,7 +121,7 @@ python 11-8_eval_negative_cases.py   # ネガティブケース回帰（11-8）
 
 ```bash
 pip install anthropic                    # uv でセットアップした場合は: uv pip install anthropic
-export ANTHROPIC_API_KEY=sk-ant-...      # Windows (cmd) は set ANTHROPIC_API_KEY=...
+export ANTHROPIC_API_KEY=sk-ant-...      # Windows (cmd) は set ANTHROPIC_API_KEY=... Windows（powershell）は $env:ANTHROPIC_API_KEY="..."
 python interactive_knowledge_agent.py
 ```
 

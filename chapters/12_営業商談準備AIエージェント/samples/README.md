@@ -8,7 +8,7 @@
 ## 収録ファイル
 
 | ファイル | 対応する本文の節 | 確かめられること | APIキー |
-|---------|----------------|----------------|--------|
+| --------- | ---------------- | ---------------- | -------- |
 | `_common.py` | 12-3、12-4、12-6、12-7 | 共通部品（ダミーのWeb・CRM・過去案件データ、計画のリスク判定ルール、計画・統合の擬似モデル）。単体実行はしない | 不要 |
 | `12-5_langgraph_features_minimal.py` | 12-3「HITLをどこで発動するか」/ 12-5「Executorが計画を実行する」 | `interrupt`＋`Command(resume=...)`、ToolNode、再帰エッジ＋`recursion_limit` の3機能をそれぞれ独立した最小例で | 不要 |
 | `12-4_planner_hitl.py` | 12-3 / 12-4「Plannerが調査計画を立てる」 | 通常計画は自動実行、リスクのある計画だけ `interrupt` で停止し、承認・却下で分岐すること | 不要 |
@@ -93,7 +93,7 @@ python 12-2_export_mermaid.py               # グラフ構造を .mmd へ書き�
 
 ```bash
 pip install anthropic                    # uv でセットアップした場合は: uv pip install anthropic
-export ANTHROPIC_API_KEY=sk-ant-...      # Windows (cmd) は set ANTHROPIC_API_KEY=...
+export ANTHROPIC_API_KEY=sk-ant-...      # Windows (cmd) は set ANTHROPIC_API_KEY=... Windows（powershell）は $env:ANTHROPIC_API_KEY="..."
 python interactive_meeting_prep.py
 ```
 

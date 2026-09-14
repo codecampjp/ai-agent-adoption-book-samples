@@ -13,7 +13,7 @@
 ## 収録ファイル
 
 | ファイル | 本文の節 | 確かめられること | APIキー |
-|---------|---------|----------------|--------|
+| --------- | --------- | ---------------- | -------- |
 | [`6-1_dify_cloud_handson.md`](6-1_dify_cloud_handson.md) | 6-1 | Difyクラウド版（ブラウザのみ）で質問応答Botを実際に組んで動かす手順 | Dify側でモデル設定が必要（無料枠モデルで代替できる場合あり） |
 | [`6-1_dify_agent_setup.md`](6-1_dify_agent_setup.md) | 6-1 | Difyの画面ごとの詳細な操作手順（クラウド版・セルフホスト版共通） | 同上 |
 | [`6-1_サンプル社内規程.md`](6-1_サンプル社内規程.md) | 6-1 | 上記手順でナレッジに登録する架空の社内規程 | 不要 |
@@ -89,7 +89,7 @@ python 6-5_agent_loop_observable.py
 セットアップ済みの環境でAPIキーを設定すると、実際にClaudeがループを自走させます。
 
 ```bash
-export ANTHROPIC_API_KEY=sk-ant-...      # Windows は set ANTHROPIC_API_KEY=...
+export ANTHROPIC_API_KEY=sk-ant-...      # Windows（cmd）は set ANTHROPIC_API_KEY=... Windows（powershell）は $env:ANTHROPIC_API_KEY="..." 
 python 6-3_agent_loop_minimal.py
 python 6-4_agent_loop_observable.py
 python 6-5_agent_loop_observable.py
@@ -121,7 +121,7 @@ Difyのハンズオンを自分の手で確かめたい場合は [`6-1_dify_clou
 ## うまくいかないとき
 
 | 症状 | 対処 |
-|------|------|
+| ------ | ------ |
 | `ModuleNotFoundError: No module named 'anthropic'` | ドライランには不要です。本番モードにするにはセットアップの手順でインストールしてください |
 | キーを設定したのにドライランになる | `echo $ANTHROPIC_API_KEY`（Windows は `echo %ANTHROPIC_API_KEY%`）で同じシェルに設定されているか確認してください |
 | `not_found_error` などモデル名に関するエラー | モデル名の世代交代です。`6-3_agent_loop_minimal.py` の `MODEL` を現行モデル名に書き換えてください |
