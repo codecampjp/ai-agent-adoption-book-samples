@@ -15,7 +15,7 @@
 
 ## 前提
 
-- Python 3.10 以上（3.10〜3.12 で動作確認）
+- Python **3.12.12 を推奨**。今回の検証に使ったバージョンです。以下のuv手順で指定できます
 - パッケージ管理は [uv](https://docs.astral.sh/uv/) を推奨します。uv がない場合は標準の `venv` + `pip` でも同じ手順で動きます
 - 動作確認バージョン: chromadb 1.5.x / sentence-transformers 5.x（`requirements.txt` に記載）
 
@@ -23,14 +23,18 @@
 
 リポジトリのルートから、使っているOS・シェルに対応するブロックだけを実行してください。仮想環境の有効化は、以降の章でも同じ使い分けになります。
 
-### uv を使う場合
+### uv を使う場合（推奨：Python 3.12.12を指定）
+
+`uv python install` でPython 3.12.12を用意し、`uv venv --python 3.12.12` でそのバージョンの仮想環境を作ります。仮想環境を有効化した後、`python --version` が `Python 3.12.12` と表示されることを確認してから、依存パッケージを導入してください。
 
 macOS / Linux（bash・zsh）:
 
 ```bash
 cd chapters/03_ベクターDBとRAG/samples
-uv venv
+uv python install 3.12.12
+uv venv --python 3.12.12
 source .venv/bin/activate
+python --version
 uv pip install -r requirements.txt
 ```
 
@@ -38,8 +42,10 @@ Windows（コマンドプロンプト / cmd）:
 
 ```bat
 cd chapters/03_ベクターDBとRAG/samples
-uv venv
+uv python install 3.12.12
+uv venv --python 3.12.12
 .venv\Scripts\activate.bat
+python --version
 uv pip install -r requirements.txt
 ```
 
@@ -47,19 +53,25 @@ Windows（PowerShell）:
 
 ```powershell
 cd chapters/03_ベクターDBとRAG/samples
-uv venv
+uv python install 3.12.12
+uv venv --python 3.12.12
 .\.venv\Scripts\Activate.ps1
+python --version
 uv pip install -r requirements.txt
 ```
 
 ### uv がない場合（標準の venv + pip）
 
+Python 3.12.12が既にインストールされている方向けです。最初のバージョン確認で `Python 3.12.12` と表示されることを確認してから、仮想環境を作成してください。別のバージョンが表示される場合は、上のuv手順を使うと3.12.12を指定できます。有効化後にも同じバージョンが表示されることを確認します。
+
 macOS / Linux（bash・zsh）:
 
 ```bash
 cd chapters/03_ベクターDBとRAG/samples
+python3 --version
 python3 -m venv .venv
 source .venv/bin/activate
+python --version
 python -m pip install -r requirements.txt
 ```
 
@@ -67,8 +79,10 @@ Windows（コマンドプロンプト / cmd）:
 
 ```bat
 cd chapters/03_ベクターDBとRAG/samples
+python --version
 python -m venv .venv
 .venv\Scripts\activate.bat
+python --version
 python -m pip install -r requirements.txt
 ```
 
@@ -76,8 +90,10 @@ Windows（PowerShell）:
 
 ```powershell
 cd chapters/03_ベクターDBとRAG/samples
+python --version
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
+python --version
 python -m pip install -r requirements.txt
 ```
 
