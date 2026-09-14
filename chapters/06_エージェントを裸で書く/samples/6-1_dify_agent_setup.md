@@ -28,6 +28,13 @@
 
 **モデルプロバイダーの登録**
 
+APIキーをまだ取得していない場合は、利用するプロバイダーの公式案内に従って取得する。
+
+- [Anthropic：APIキーの取得方法（公式）](https://platform.claude.com/docs/en/get-api-key)
+- [OpenAI：APIキーの作成方法（公式）](https://developers.openai.com/api/docs/quickstart#create-and-export-an-api-key)
+
+この手順では、取得したAPIキーをDifyに登録する。リンク先にある環境変数の設定やサンプルコードの実行は不要。
+
 右上のアカウントアイコン →「設定」→「モデルプロバイダー」で、使用するプロバイダー（Anthropic、OpenAIなど）のAPIキーを登録する。**ツール呼び出し（Function Calling）に対応したモデル**を使うこと。
 
 使用するプロバイダーが設定済みになっていることを確認してから、アプリを作成する。
