@@ -21,28 +21,64 @@
 
 ## セットアップ
 
-uv を使う場合:
+リポジトリのルートから、使っているOS・シェルに対応するブロックだけを実行してください。仮想環境の有効化は、以降の章でも同じ使い分けになります。
+
+### uv を使う場合
+
+macOS / Linux（bash・zsh）:
 
 ```bash
 cd chapters/03_ベクターDBとRAG/samples
 uv venv
-source .venv/bin/activate        
-# Windows（cmd/powershell）の場合は下記のコマンドになります。sourceの記述は不要です。以降のチャプターも同様です。
-.venv\Scripts\activate
-
+source .venv/bin/activate
 uv pip install -r requirements.txt
 ```
 
-uv がない場合（標準の venv + pip）:
+Windows（コマンドプロンプト / cmd）:
+
+```bat
+cd chapters/03_ベクターDBとRAG/samples
+uv venv
+.venv\Scripts\activate.bat
+uv pip install -r requirements.txt
+```
+
+Windows（PowerShell）:
+
+```powershell
+cd chapters/03_ベクターDBとRAG/samples
+uv venv
+.\.venv\Scripts\Activate.ps1
+uv pip install -r requirements.txt
+```
+
+### uv がない場合（標準の venv + pip）
+
+macOS / Linux（bash・zsh）:
 
 ```bash
 cd chapters/03_ベクターDBとRAG/samples
 python3 -m venv .venv
-source .venv/bin/activate        
-# Windows（cmd/powershell）の場合は下記のコマンドになります。sourceの記述は不要です。以降のチャプターも同様です。
-.venv\Scripts\activate
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+```
 
-pip install -r requirements.txt
+Windows（コマンドプロンプト / cmd）:
+
+```bat
+cd chapters/03_ベクターDBとRAG/samples
+python -m venv .venv
+.venv\Scripts\activate.bat
+python -m pip install -r requirements.txt
+```
+
+Windows（PowerShell）:
+
+```powershell
+cd chapters/03_ベクターDBとRAG/samples
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
 ```
 
 ## APIキーなしで確認する（ドライラン）
@@ -82,13 +118,42 @@ python 3-4_rag_with_generation.py
 
 3-4 の「生成」まで試す場合は、`anthropic` パッケージと Anthropic の API キーが必要です。
 
+まず、セットアップで選んだ方法に合わせて `anthropic` を導入します。仮想環境を有効化した、第3章の `samples` フォルダで実行してください。
+
+uv を使った場合（全シェル共通）:
+
+```text
+uv pip install anthropic
+```
+
+標準の venv を使った場合（全シェル共通）:
+
+```text
+python -m pip install anthropic
+```
+
+次に、使っているシェルのブロックだけを実行します。`sk-ant-...` は自分のAPIキーに置き換えてください。
+
+macOS / Linux（bash・zsh）:
+
 ```bash
-pip install anthropic                    # uv でセットアップした場合は: uv pip install anthropic
-export ANTHROPIC_API_KEY=sk-ant-...      # Windows (cmd) は set ANTHROPIC_API_KEY=... powershellの場合$env:ANTHROPIC_API_KEY=...
+export ANTHROPIC_API_KEY="sk-ant-..."
 python 3-4_rag_with_generation.py
 ```
 
-> uv の `uv venv` で作った仮想環境には `pip` コマンドが入っていません。uv でセットアップした場合は `pip install ...` の代わりに `uv pip install ...` を使ってください。
+Windows（コマンドプロンプト / cmd）:
+
+```bat
+set "ANTHROPIC_API_KEY=sk-ant-..."
+python 3-4_rag_with_generation.py
+```
+
+Windows（PowerShell）:
+
+```powershell
+$env:ANTHROPIC_API_KEY="sk-ant-..."
+python 3-4_rag_with_generation.py
+```
 
 プロンプト表示に続けて「=== Claude の回答 ===」として、参考文書に基づいた回答が表示されます。
 
